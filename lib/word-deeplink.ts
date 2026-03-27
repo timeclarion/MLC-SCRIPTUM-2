@@ -1,15 +1,18 @@
 /**
  * Abre um modelo no Word Desktop via URI scheme do Office.
- * Funciona tanto em HTTPS quanto em HTTP/localhost.
  *
- * Formato: ms-word:ofe|u|<url-do-docx>
+ * Usa ms-word:nft (new from template) que:
+ *   - Cria um documento NOVO baseado no template
+ *   - NAO abre em Protected View (porque e um documento novo local)
+ *   - Permite edicao imediata
+ *   - A extensao Scriptum abre automaticamente (AutoOpen)
  */
 export function abrirNoWord(modeloId: number | string) {
   const baseUrl = window.location.origin
-  const docxUrl = `${baseUrl}/docs/${modeloId}/modelo.docx`
 
-  // Tenta abrir no Word via URI scheme (funciona em HTTP e HTTPS)
-  const wordUri = `ms-word:ofe|u|${docxUrl}`
+  // nft (new from template) com .dotx — cria doc novo, sem Protected View
+  const dotxUrl = `${baseUrl}/docs/${modeloId}/modelo.dotx`
+  const wordUri = `ms-word:nft|u|${dotxUrl}`
   window.location.href = wordUri
 
   // Fallback apos 3s: se o navegador ainda tem foco, Word nao abriu

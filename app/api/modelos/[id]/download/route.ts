@@ -27,7 +27,8 @@ export async function GET(
     )
   }
 
-  // Gera o .docx com a custom property mlc_modelo_id
+  // Gera documento em branco com apenas a custom property mlc_modelo_id
+  // A extensao Scriptum detecta essa property e carrega o modelo automaticamente
   const doc = new Document({
     customProperties: [
       {
@@ -37,46 +38,7 @@ export async function GET(
     ],
     sections: [
       {
-        children: [
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: modelo.nome,
-                bold: true,
-                size: 28,
-              }),
-            ],
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `Tipo: ${modelo.tipoBase}`,
-                size: 20,
-                color: "888888",
-              }),
-            ],
-            spacing: { after: 400 },
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: modelo.descricao || "Modelo de peticao juridica - MLC Advocacia",
-                size: 22,
-              }),
-            ],
-            spacing: { after: 400 },
-          }),
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: "Este documento foi gerado pelo sistema MLC Scriptum. A extensao do Word carregara automaticamente o modelo com as variaveis para preenchimento.",
-                italics: true,
-                size: 18,
-                color: "999999",
-              }),
-            ],
-          }),
-        ],
+        children: [],
       },
     ],
   })
@@ -90,15 +52,22 @@ export async function GET(
     .replace(/[^a-zA-Z0-9\s-]/g, "")
     .replace(/\s+/g, "_")
 
+  // Detecta se deve servir como template (.dotx)
+  // Verifica ?template=true OU se a URL original continha .dotx
+  const originalUrl = request.headers.get("x-matched-path") || request.nextUrl.pathname || ""
+  const isTemplate = request.nextUrl.searchParams.get("template") === "true" || originalUrl.includes(".dotx")
+  const contentType = isTemplate
+    ? "application/vnd.openxmlformats-officedocument.wordprocessingml.template"
+    : "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  const ext = isTemplate ? "dotx" : "docx"
+
   return new NextResponse(buffer, {
     status: 200,
     headers: {
-      "Content-Type":
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "Content-Disposition": `inline; filename="${fileName}.docx"`,
+      "Content-Type": contentType,
+      "Content-Disposition": `inline; filename="${fileName}.${ext}"`,
       "Content-Length": String(buffer.byteLength),
       "Cache-Control": "no-cache, no-store, must-revalidate",
-      "ngrok-skip-browser-warning": "true",
     },
   })
 }

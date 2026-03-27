@@ -13,6 +13,10 @@ const nextConfig = {
         source: '/docs/:id/modelo.docx',
         destination: '/api/modelos/:id/download',
       },
+      {
+        source: '/docs/:id/modelo.dotx',
+        destination: '/api/modelos/:id/download',
+      },
     ]
   },
 }
