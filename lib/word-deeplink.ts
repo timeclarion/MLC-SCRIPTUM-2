@@ -10,9 +10,9 @@
 export function abrirNoWord(modeloId: number | string) {
   const baseUrl = window.location.origin
 
-  // nft (new from template) com .dotx — cria doc novo, sem Protected View
-  const dotxUrl = `${baseUrl}/docs/${modeloId}/modelo.dotx`
-  const wordUri = `ms-word:nft|u|${dotxUrl}`
+  // ofe (open for edit) com .docx — abre o documento no Word
+  const docxUrl = `${baseUrl}/docs/${modeloId}/modelo.docx`
+  const wordUri = `ms-word:ofe|u|${docxUrl}`
   window.location.href = wordUri
 
   // Fallback apos 3s: se o navegador ainda tem foco, Word nao abriu
