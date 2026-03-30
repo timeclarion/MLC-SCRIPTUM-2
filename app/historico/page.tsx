@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatTimestampFull } from "@/lib/format"
+import { ListSkeleton } from "@/components/ui/skeleton-loaders"
 
 const users = ["Todos"]
 const actionTypes = ["Todas", "criado", "editado", "utilizado"]
@@ -196,9 +197,7 @@ export default function HistoricoPage() {
 
       {/* Activity List ou Empty State */}
       {activityLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
+        <ListSkeleton count={6} />
       ) : activityHistory.length === 0 ? (
         <div className="bg-card rounded-xl border border-border">
           <EmptyState

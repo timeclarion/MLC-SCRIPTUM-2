@@ -45,6 +45,36 @@ function useSupabaseQuery<T>(
   return { data, loading, error, refetch, setData }
 }
 
+// ─── Realtime subscription hook ───────────────────────────────
+
+function useRealtimeSubscription<T>(
+  table: string,
+  setData: (updater: (prev: T[] | null) => T[] | null) => void
+) {
+  useEffect(() => {
+    const channel = supabase
+      .channel(`realtime-${table}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setData((prev) => prev ? [...prev, payload.new as T] : [payload.new as T])
+        } else if (payload.eventType === 'UPDATE') {
+          setData((prev) => prev ? prev.map(item =>
+            (item as any).id === payload.new.id ? payload.new as T : item
+          ) : prev)
+        } else if (payload.eventType === 'DELETE') {
+          setData((prev) => prev ? prev.filter(item =>
+            (item as any).id !== payload.old.id
+          ) : prev)
+        }
+      })
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [table, setData])
+}
+
 // ─── Dashboard Metrics ────────────────────────────────────────
 
 export function useDashboardMetrics() {
@@ -83,7 +113,7 @@ export function useDashboardMetrics() {
 // ─── Atividades (recentes) ────────────────────────────────────
 
 export function useAtividades(limit?: number) {
-  return useSupabaseQuery<Atividade[]>(async () => {
+  const result = useSupabaseQuery<Atividade[]>(async () => {
     let query = supabase
       .from("atividades")
       .select("*")
@@ -93,12 +123,16 @@ export function useAtividades(limit?: number) {
 
     return query
   })
+
+  useRealtimeSubscription<Atividade>("atividades", result.setData)
+
+  return result
 }
 
 // ─── Word Syncs ───────────────────────────────────────────────
 
 export function useWordSyncs(limit?: number) {
-  return useSupabaseQuery<WordSync[]>(async () => {
+  const result = useSupabaseQuery<WordSync[]>(async () => {
     let query = supabase
       .from("word_syncs")
       .select("*")
@@ -108,6 +142,10 @@ export function useWordSyncs(limit?: number) {
 
     return query
   })
+
+  useRealtimeSubscription<WordSync>("word_syncs", result.setData)
+
+  return result
 }
 
 // ─── Modelos de Peticao (Extensao Word) ───────────────────────
@@ -123,12 +161,16 @@ export function useModelosPeticao() {
 }
 
 export function useAllModelosPeticao() {
-  return useSupabaseQuery<ModeloPeticao[]>(async () => {
+  const result = useSupabaseQuery<ModeloPeticao[]>(async () => {
     return supabase
       .from("ModeloPeticao")
       .select("id, nome, tipoBase, descricao, ativo, storage_path")
       .order("nome")
   })
+
+  useRealtimeSubscription<ModeloPeticao>("ModeloPeticao", result.setData)
+
+  return result
 }
 
 // ─── Modelos ──────────────────────────────────────────────────
@@ -149,12 +191,16 @@ export async function deleteModelo(id: string) {
 // ─── Documentos ───────────────────────────────────────────────
 
 export function useDocumentos() {
-  return useSupabaseQuery<Documento[]>(async () => {
+  const result = useSupabaseQuery<Documento[]>(async () => {
     return supabase
       .from("documentos")
       .select("*")
       .order("updated_at", { ascending: false })
   })
+
+  useRealtimeSubscription<Documento>("documentos", result.setData)
+
+  return result
 }
 
 export async function deleteDocumento(id: string) {
@@ -164,12 +210,16 @@ export async function deleteDocumento(id: string) {
 // ─── Usuarios ─────────────────────────────────────────────────
 
 export function useUsuarios() {
-  return useSupabaseQuery<User[]>(async () => {
+  const result = useSupabaseQuery<User[]>(async () => {
     return supabase
       .from("users")
       .select("*")
       .order("nome")
   })
+
+  useRealtimeSubscription<User>("users", result.setData)
+
+  return result
 }
 
 export async function createUsuario(data: {

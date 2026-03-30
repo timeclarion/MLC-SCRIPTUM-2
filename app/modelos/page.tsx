@@ -22,6 +22,7 @@ import {
   Building2
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ListSkeleton } from "@/components/ui/skeleton-loaders"
 
 const tipoBaseLabels: Record<string, string> = {
   "JUDICIAL_TJ": "Judicial",
@@ -197,9 +198,7 @@ export default function ModelosPage() {
 
       {/* Lista de modelos */}
       {modelosLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
+        <ListSkeleton count={5} />
       ) : modelos.length === 0 ? (
         <div className="bg-card rounded-xl border border-border">
           <EmptyState

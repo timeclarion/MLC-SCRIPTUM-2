@@ -24,6 +24,7 @@ import {
   AlertCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ListSkeleton } from "@/components/ui/skeleton-loaders"
 
 const typeOptions = ["Todos", "peticao", "contrato", "parecer"]
 const statusOptions = ["Todos", "rascunho", "em_revisao", "finalizado"]
@@ -255,9 +256,7 @@ export default function DocumentosPage() {
 
       {/* Lista de documentos ou empty state */}
       {documentosLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
+        <ListSkeleton count={5} />
       ) : documentos.length === 0 ? (
         <div className="bg-card rounded-xl border border-border">
           <EmptyState

@@ -27,6 +27,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatTimestamp } from "@/lib/format"
+import { UserListSkeleton } from "@/components/ui/skeleton-loaders"
 
 interface Permission {
   key: string
@@ -334,9 +335,7 @@ export default function UsuariosPage() {
 
       {/* Lista de usuarios ou empty state */}
       {usersLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
+        <UserListSkeleton count={4} />
       ) : users.length === 0 ? (
         <div className="bg-card rounded-xl border border-border">
           <EmptyState

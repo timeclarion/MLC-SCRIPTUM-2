@@ -1,8 +1,10 @@
 "use client"
 
-import { Bell, Search, User, LogOut, Settings } from "lucide-react"
+import { Search, User, LogOut, Settings } from "lucide-react"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
+import { CommandPalette, useCommandPalette } from "@/components/command-palette"
+import { NotificationsDropdown } from "@/components/notifications"
 
 interface HeaderProps {
   title: string
@@ -11,6 +13,7 @@ interface HeaderProps {
 
 export function Header({ title, description }: HeaderProps) {
   const [showUserMenu, setShowUserMenu] = useState(false)
+  const commandPalette = useCommandPalette()
 
   return (
     <header className="sticky top-0 z-10 flex items-center justify-between h-16 px-6 lg:px-8 bg-background border-b border-border">
@@ -25,7 +28,11 @@ export function Header({ title, description }: HeaderProps) {
 
       <div className="flex items-center gap-2">
         {/* Search */}
-        <button data-tour="search" className="flex items-center gap-2 px-3 py-2 text-sm text-foreground-secondary bg-secondary rounded-lg hover:bg-accent transition-colors">
+        <button
+          data-tour="search"
+          onClick={commandPalette.open}
+          className="flex items-center gap-2 px-3 py-2 text-sm text-foreground-secondary bg-secondary rounded-lg hover:bg-accent transition-colors"
+        >
           <Search className="w-4 h-4" />
           <span className="hidden sm:inline">Buscar...</span>
           <kbd className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-mono bg-background rounded border border-border">
@@ -34,10 +41,7 @@ export function Header({ title, description }: HeaderProps) {
         </button>
 
         {/* Notifications */}
-        <button className="relative flex items-center justify-center w-9 h-9 rounded-lg text-foreground-secondary hover:bg-accent transition-colors">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
-        </button>
+        <NotificationsDropdown />
 
         {/* User Menu */}
         <div className="relative">
@@ -79,6 +83,8 @@ export function Header({ title, description }: HeaderProps) {
           )}
         </div>
       </div>
+
+      <CommandPalette isOpen={commandPalette.isOpen} onClose={commandPalette.close} />
     </header>
   )
 }

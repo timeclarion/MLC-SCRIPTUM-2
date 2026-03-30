@@ -23,6 +23,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatTimestamp } from "@/lib/format"
+import { DashboardSkeleton } from "@/components/ui/skeleton-loaders"
 
 const getActivityIcon = (tipo: Atividade["tipo"]) => {
   switch (tipo) {
@@ -114,17 +115,17 @@ export default function DashboardPage() {
         </p>
       </section>
 
+      {metricsLoading ? (
+        <DashboardSkeleton />
+      ) : (
+      <>
       {/* Metrics Section */}
       <section data-tour="dashboard-stats" className="mb-8">
         <h2 className="text-xs font-medium text-foreground-secondary uppercase tracking-wider mb-4">
           Resumo
         </h2>
-        
-        {metricsLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
-          </div>
-        ) : metrics ? (
+
+        {metrics ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
               onClick={() => handleMetricClick("/modelos")}
@@ -200,8 +201,17 @@ export default function DashboardPage() {
           </h2>
           <div className="bg-card rounded-xl border border-border">
             {activitiesLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <div className="animate-pulse divide-y divide-border">
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <div key={i} className="flex items-start gap-3 p-4">
+                    <div className="w-8 h-8 rounded-lg bg-[#F3F2EE] flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="h-3.5 w-3/4 bg-[#F3F2EE] rounded-lg mb-2" />
+                      <div className="h-3 w-1/2 bg-[#F3F2EE] rounded-lg mb-2" />
+                      <div className="h-2.5 w-1/3 bg-[#F3F2EE] rounded-lg" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (activities ?? []).length > 0 ? (
               <>
@@ -334,6 +344,8 @@ export default function DashboardPage() {
           </div>
         </section>
       </div>
+      </>
+      )}
     </AppLayout>
   )
 }
